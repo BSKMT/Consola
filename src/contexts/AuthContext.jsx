@@ -36,7 +36,7 @@ export function AuthProvider({ children }) {
       localStorage.setItem('bskmt_refreshToken', data.refreshToken)
       
       // Obtener datos del usuario
-      const userResponse = await apiClient.get('/auth/me')
+      const userResponse = await apiClient.get('/users/me')
       setUser(userResponse.data.user)
       
       navigate('/dashboard')
