@@ -11,12 +11,24 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setError('')
+
     try {
+      // Endpoint: POST /auth/login (según tu authRoutes.js)
       const response = await api.post('/auth/login', { email, password })
-      localStorage.setItem('token', response.data.token)
-      navigate('/') // Redirige al dashboard después del login
+
+      // Tu backend devuelve { accessToken, refreshToken } en response.data
+      const { accessToken } = response.data
+
+      // Guardar el token en localStorage (o cookies si prefieres)
+      localStorage.setItem('token', accessToken)
+
+      // Redirigir al dashboard
+      navigate('/')
     } catch (err) {
-      setError('Credenciales incorrectas o error en el servidor')
+      // Manejo de errores específicos según tu backend
+      const errorMessage = err.response?.data?.message || 'Error al iniciar sesión'
+      setError(errorMessage)
     }
   }
 
