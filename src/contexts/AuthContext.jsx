@@ -14,7 +14,7 @@ export function AuthProvider({ children }) {
       try {
         const token = localStorage.getItem('bskmt_accessToken')
         if (token) {
-          const { data } = await apiClient.get('/auth/me') // Asegúrate de tener este endpoint
+          const { data } = await apiClient.get('/users/me')
           setUser(data.user)
         }
       } catch (error) {
