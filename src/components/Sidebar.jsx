@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom' // Faltaba esta importación
 import { FaMotorcycle, FaUsers, FaCog, FaUserPlus } from 'react-icons/fa'
 
 export default function Sidebar() {
@@ -7,15 +8,15 @@ export default function Sidebar() {
         <h1 className="text-xl font-bold">BSKMT Dashboard</h1>
       </div>
       <nav className="mt-4">
-        <a href="/" className="flex items-center p-3 hover:bg-gray-700">
+        <Link to="/" className="flex items-center p-3 hover:bg-gray-700">
           <FaMotorcycle className="mr-2" /> Motos
-        </a>
-        <a href="/users" className="flex items-center p-3 hover:bg-gray-700">
+        </Link>
+        <Link to="/users" className="flex items-center p-3 hover:bg-gray-700">
           <FaUsers className="mr-2" /> Usuarios
-        </a>
-        <a href="/settings" className="flex items-center p-3 hover:bg-gray-700">
+        </Link>
+        <Link to="/settings" className="flex items-center p-3 hover:bg-gray-700">
           <FaCog className="mr-2" /> Configuración
-        </a>
+        </Link>
         <Link to="/users/create" className="flex items-center p-3 hover:bg-gray-700">
           <FaUserPlus className="mr-2" /> Crear Usuario
         </Link>
