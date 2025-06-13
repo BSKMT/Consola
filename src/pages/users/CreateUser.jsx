@@ -95,98 +95,160 @@ export default function CreateUser() {
     }
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsSubmitting(true);
-        setError('');
+  e.preventDefault();
+  setIsSubmitting(true);
+  setError('');
 
-        try {
-            // 1. Validar campos obligatorios
-            const requiredFields = [
-                'documentType', 'documentNumber', 'firstName', 'lastName',
-                'birthDate', 'city', 'phone', 'email', 'password',
-                'dataConsent', 'liabilityWaiver', 'termsAcceptance'
-            ];
-
-            const missingFields = requiredFields.filter(field => {
-                // Manejar casos especiales para booleanos
-                if (['dataConsent', 'liabilityWaiver', 'termsAcceptance'].includes(field)) {
-                    return userData[field] !== true;
-                }
-                return !userData[field];
-            });
-
-            if (missingFields.length > 0) {
-                throw new Error(`Faltan campos obligatorios: ${missingFields.join(', ')}`);
-            }
-
-            // 2. Validar contraseña
-            if (userData.password.length < 8) {
-                throw new Error('La contraseña debe tener al menos 8 caracteres');
-            }
-
-            // 3. Preparar datos para el backend
-            const payload = {
-                ...userData,
-                // Transformar tipos de datos
-                birthDate: new Date(userData.birthDate),
-                phone: userData.phone.replace(/\D/g, ''), // Eliminar caracteres no numéricos
-                whatsapp: userData.whatsapp?.replace(/\D/g, ''),
-                emergencyContactPhone: userData.emergencyContactPhone?.replace(/\D/g, ''),
-                // Asegurar valores numéricos
-                points: Number(userData.points) || 0,
-                ridePoints: Number(userData.ridePoints) || 0,
-                eventPoints: Number(userData.eventPoints) || 0,
-                trainingPoints: Number(userData.trainingPoints) || 0,
-                partnerConsumptionPoints: Number(userData.partnerConsumptionPoints) || 0,
-                otherPoints: Number(userData.otherPoints) || 0,
-                // Normalizar email
-                email: userData.email.toLowerCase(),
-                // Campos de moto
-                motorcyclePlate: userData.motorcyclePlate?.toUpperCase(),
-                // Convertir strings vacíos a null
-                ...Object.fromEntries(
-                    Object.entries(userData).map(([key, value]) => [
-                        key,
-                        typeof value === 'string' && value.trim() === '' ? null : value
-                    ])
-                )
-            };
-
-            // 4. Enviar datos al backend
-            const response = await api.post('/users', payload);
-
-            // 5. Redirigir con mensaje de éxito
-            navigate('/users', {
-                state: {
-                    success: `Usuario ${payload.firstName} ${payload.lastName} creado exitosamente!`
-                }
-            });
-
-        } catch (err) {
-            // Manejo mejorado de errores
-            const backendError = err.response?.data;
-
-            if (backendError?.errors) {
-                // Mostrar errores de validación detallados del backend
-                const errorMessages = backendError.errors.map(e =>
-                    `• ${e.field ? `${e.field}: ` : ''}${e.message}`
-                );
-                setError(errorMessages.join('\n'));
-            } else if (backendError?.message) {
-                // Mostrar mensaje de error del backend
-                setError(backendError.message);
-            } else {
-                // Mostrar error genérico
-                setError(err.message || 'Error al crear el usuario. Por favor verifica los datos.');
-            }
-
-            // Scroll automático al error
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        } finally {
-            setIsSubmitting(false);
-        }
+  try {
+    // 1. Validación de campos obligatorios
+    const requiredFields = {
+      'documentType': 'Tipo de documento',
+      'documentNumber': 'Número de documento',
+      'firstName': 'Nombres',
+      'lastName': 'Apellidos',
+      'birthDate': 'Fecha de nacimiento',
+      'city': 'Ciudad',
+      'phone': 'Teléfono',
+      'email': 'Email',
+      'password': 'Contraseña',
+      'dataConsent': 'Consentimiento de datos',
+      'liabilityWaiver': 'Exoneración de responsabilidad',
+      'termsAcceptance': 'Términos y condiciones'
     };
+
+    const missingFields = Object.entries(requiredFields)
+      .filter(([field]) => {
+        if (['dataConsent', 'liabilityWaiver', 'termsAcceptance'].includes(field)) {
+          return userData[field] !== true;
+        }
+        return !userData[field];
+      })
+      .map(([_, name]) => name);
+
+    if (missingFields.length > 0) {
+      throw new Error(`Campos requeridos faltantes:\n${missingFields.join('\n')}`);
+    }
+
+    // 2. Validación de formatos
+    const phoneRegex = /^[0-9]{10,15}$/;
+    if (!phoneRegex.test(userData.phone.replace(/\D/g, ''))) {
+      throw new Error('El teléfono debe contener entre 10 y 15 dígitos');
+    }
+
+    if (userData.password.length < 8) {
+      throw new Error('La contraseña debe tener al menos 8 caracteres');
+    }
+
+    // 3. Preparar el payload exactamente como lo espera el backend
+    const payload = {
+      // Información básica
+      documentType: userData.documentType,
+      documentNumber: userData.documentNumber,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      
+      // Fechas (convertir a formato ISO)
+      birthDate: new Date(userData.birthDate).toISOString(),
+      
+      // Información de contacto
+      city: userData.city,
+      country: userData.country || 'Colombia', // Valor por defecto
+      phone: userData.phone.replace(/\D/g, ''),
+      email: userData.email.toLowerCase(),
+      
+      // Seguridad y permisos
+      password: userData.password,
+      role: userData.role || 'Membresia Friend', // Valor por defecto
+      temporaryPassword: userData.temporaryPassword || false,
+      
+      // Consentimientos (deben ser true)
+      dataConsent: true,
+      liabilityWaiver: true,
+      termsAcceptance: true,
+      
+      // Sistema de puntos (iniciar en 0)
+      points: 0,
+      ridePoints: 0,
+      eventPoints: 0,
+      trainingPoints: 0,
+      partnerConsumptionPoints: 0,
+      otherPoints: 0,
+      pointsHistory: 0,
+      
+      // Arrays vacíos
+      upcomingEvents: [],
+      registeredEvents: [],
+      complaints: [],
+      membershipBenefits: [],
+      
+      // Valores por defecto
+      active: true,
+      binaryGender: userData.binaryGender || 'Prefiero no decir',
+      avatar: userData.avatar || '/default-avatar.jpg'
+    };
+
+    // 4. Campos opcionales (solo si tienen valor)
+    const optionalFields = [
+      'address', 'neighborhood', 'whatsapp', 'birthPlace',
+      'genderIdentity', 'occupation', 'discipline', 'bloodType',
+      'rhFactor', 'allergies', 'physicalConditions', 'medicalTreatments',
+      'requiredMedications', 'healthInsurance', 'emergencyContactName',
+      'emergencyContactRelationship', 'emergencyContactPhone',
+      'emergencyContactCountry', 'motorcycleBrand', 'motorcycleModel',
+      'motorcycleYear', 'motorcyclePlate', 'motorcycleDisplacement'
+    ];
+
+    optionalFields.forEach(field => {
+      if (userData[field]) {
+        payload[field] = userData[field];
+        
+        // Transformaciones especiales para ciertos campos
+        if (field.includes('Phone')) {
+          payload[field] = userData[field].replace(/\D/g, '');
+        }
+        if (field === 'motorcyclePlate') {
+          payload[field] = userData[field].toUpperCase();
+        }
+      }
+    });
+
+    console.log('Payload a enviar:', payload); // Para debugging
+
+    // 5. Enviar al backend
+    const response = await api.post('/users', payload);
+    
+    // 6. Redirigir con éxito
+    navigate('/users', { 
+      state: { 
+        success: `Usuario ${payload.documentNumber} creado con éxito!`,
+        newUser: response.data.user
+      } 
+    });
+
+  } catch (err) {
+    // Manejo mejorado de errores
+    let errorMessage = 'Error al crear el usuario';
+    
+    if (err.response?.data) {
+      const backendError = err.response.data;
+      errorMessage = backendError.message || JSON.stringify(backendError);
+      
+      if (backendError.errors) {
+        errorMessage = backendError.errors.map(e => 
+          `• ${e.field || 'Error'}: ${e.message}`
+        ).join('\n');
+      }
+    } else {
+      errorMessage = err.message;
+    }
+
+    setError(errorMessage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
     // Opciones para selects
     const documentTypes = ['CC', 'CE', 'TI', 'PA', 'NIT', 'OTRO']
