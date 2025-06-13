@@ -27,26 +27,27 @@ export function AuthProvider({ children }) {
     loadUser()
   }, [])
 
-  const login = async (credentials) => {
+const login = async (credentials) => {
   try {
-    // 1. Hacer la petición de login
+    console.log('1. Iniciando login...');
     const { data } = await apiClient.post('/auth/login', credentials);
+    console.log('2. Login exitoso, token recibido:', data.token);
     
-    // 2. Guardar el token (verifica el nombre correcto en la respuesta)
-    localStorage.setItem('bskmt_token', data.token); 
+    localStorage.setItem('bskmt_token', data.token);
+    console.log('3. Token almacenado en localStorage');
     
-    // 3. Obtener datos del usuario (usando tu endpoint correcto)
     const userResponse = await apiClient.get('/users/me');
+    console.log('4. Datos de usuario recibidos:', userResponse.data);
     
-    // 4. Actualizar estado del usuario
     setUser(userResponse.data.user);
+    console.log('5. Estado de usuario actualizado');
     
-    // 5. Redirigir al dashboard
-    navigate('/dashboard', { replace: true }); // Asegúrate que esta ruta existe
+    navigate('/dashboard', { replace: true });
+    console.log('6. Navegación al dashboard ejecutada');
     
   } catch (error) {
-    console.error('Login error:', error);
-    throw new Error(error.response?.data?.message || 'Error de autenticación');
+    console.error('Error en login:', error);
+    throw error;
   }
 };
 
