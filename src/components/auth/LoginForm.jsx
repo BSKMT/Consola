@@ -18,8 +18,10 @@ export default function LoginForm() {
     
     try {
       await login(credentials)
+      // No necesitas redirigir aquí, el AuthContext ya lo hace
     } catch (err) {
-      setError(err.message || 'Email o contraseña incorrectos')
+      console.error('Login error:', err)
+      setError(err.response?.data?.message || 'Email o contraseña incorrectos')
     } finally {
       setLoading(false)
     }

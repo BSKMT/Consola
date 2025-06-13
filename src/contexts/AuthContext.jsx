@@ -1,76 +1,94 @@
-import { createContext, useContext, useState, useEffect } from 'react'
-import apiClient from '../api/client'
-import { useNavigate } from 'react-router-dom'
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const AuthContext = createContext()
+export const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const navigate = useNavigate()
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loadingAuth, setLoadingAuth] = useState(true);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    async function loadUser() {
-      try {
-        const token = localStorage.getItem('bskmt_accessToken')
-        if (token) {
-          const { data } = await apiClient.get('/users/me')
-          setUser(data.user)
-        }
-      } catch (error) {
-        console.error('Error loading user:', error)
-        logout()
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadUser()
-  }, [])
-
-const login = async (credentials) => {
-  try {
-    console.log('1. Iniciando login...');
-    const { data } = await apiClient.post('/auth/login', credentials);
-    console.log('2. Login exitoso, token recibido:', data.token);
-    
-    localStorage.setItem('bskmt_token', data.token);
-    console.log('3. Token almacenado en localStorage');
-    
-    const userResponse = await apiClient.get('/users/me');
-    console.log('4. Datos de usuario recibidos:', userResponse.data);
-    
-    setUser(userResponse.data.user);
-    console.log('5. Estado de usuario actualizado');
-    
-    navigate('/dashboard', { replace: true });
-    console.log('6. Navegación al dashboard ejecutada');
-    
-  } catch (error) {
-    console.error('Error en login:', error);
-    throw error;
-  }
-};
-
-  const logout = async () => {
+  // Verifica si el token es válido (igual que en bskmt.com)
+  const isTokenValid = (token) => {
+    if (!token) return false;
     try {
-      await apiClient.post('/auth/logout')
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error)
-    } finally {
-      localStorage.removeItem('bskmt_accessToken')
-      localStorage.removeItem('bskmt_refreshToken')
-      setUser(null)
-      navigate('/login')
+      const decoded = JSON.parse(atob(token.split('.')[1]));
+      return decoded.exp > Date.now() / 1000;
+    } catch {
+      return false;
     }
-  }
+  };
+
+  // Login adaptado para la consola
+  const login = async (credentials) => {
+    try {
+      const response = await axios.post('https://api.bskmt.com/auth/login', credentials);
+      
+      // Asegúrate que estos nombres coincidan con la respuesta de tu API
+      const { accessToken, refreshToken, data } = response.data;
+      
+      localStorage.setItem('bskmt_accessToken', accessToken);
+      localStorage.setItem('bskmt_refreshToken', refreshToken);
+      
+      // Obtener datos completos del usuario (adaptado para la consola)
+      const userResponse = await axios.get('https://api.bskmt.com/users/me', {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      
+      setUser(userResponse.data.user);
+      
+      // Redirección FORZADA al dashboard
+      window.location.href = '/dashboard'; // Esto evita problemas con React Router
+      
+      return userResponse.data.user;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
+  };
+
+  // Logout (similar al original)
+  const logout = () => {
+    localStorage.removeItem('bskmt_accessToken');
+    localStorage.removeItem('bskmt_refreshToken');
+    setUser(null);
+    window.location.href = '/login'; // Redirección forzada
+  };
+
+  // Verificación inicial de autenticación
+  useEffect(() => {
+    const verifyAuth = async () => {
+      const token = localStorage.getItem('bskmt_accessToken');
+      
+      if (token && isTokenValid(token)) {
+        try {
+          const response = await axios.get('https://api.bskmt.com/users/me', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setUser(response.data.user);
+        } catch (error) {
+          console.error('Auth verification error:', error);
+          logout();
+        }
+      }
+      setLoadingAuth(false);
+    };
+
+    verifyAuth();
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
-      {children}
+    <AuthContext.Provider value={{ user, loadingAuth, login, logout }}>
+      {!loadingAuth && children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
 
-export function useAuth() {
-  return useContext(AuthContext)
-}
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
