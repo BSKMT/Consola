@@ -12,10 +12,10 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     async function loadUser() {
       try {
-        const token = localStorage.getItem('bskmt_token')
+        const token = localStorage.getItem('bskmt_accessToken')
         if (token) {
-          const { data } = await apiClient.get('/auth/me')
-          setUser(data)
+          const { data } = await apiClient.get('/auth/me') // Asegúrate de tener este endpoint
+          setUser(data.user)
         }
       } catch (error) {
         console.error('Error loading user:', error)
@@ -28,16 +28,34 @@ export function AuthProvider({ children }) {
   }, [])
 
   const login = async (credentials) => {
-    const { data } = await apiClient.post('/auth/login', credentials)
-    localStorage.setItem('bskmt_token', data.token)
-    setUser(data.user)
-    navigate('/dashboard')
+    try {
+      const { data } = await apiClient.post('/auth/login', credentials)
+      
+      // Guardar tokens en localStorage
+      localStorage.setItem('bskmt_accessToken', data.accessToken)
+      localStorage.setItem('bskmt_refreshToken', data.refreshToken)
+      
+      // Obtener datos del usuario
+      const userResponse = await apiClient.get('/auth/me')
+      setUser(userResponse.data.user)
+      
+      navigate('/dashboard')
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Error de autenticación')
+    }
   }
 
-  const logout = () => {
-    localStorage.removeItem('bskmt_token')
-    setUser(null)
-    navigate('/login')
+  const logout = async () => {
+    try {
+      await apiClient.post('/auth/logout')
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error)
+    } finally {
+      localStorage.removeItem('bskmt_accessToken')
+      localStorage.removeItem('bskmt_refreshToken')
+      setUser(null)
+      navigate('/login')
+    }
   }
 
   return (

@@ -4,10 +4,11 @@ import { useAuth } from './contexts/AuthContext'
 import Layout from './components/layout/Layout'
 import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
+import ProtectedRoute from './components/ProtectedRoute'
 import Loader from './components/ui/Loader'
 
 function App() {
-  const { user, loading } = useAuth()
+  const { loading } = useAuth()
 
   if (loading) {
     return <Loader fullScreen />
@@ -16,17 +17,18 @@ function App() {
   return (
     <Suspense fallback={<Loader fullScreen />}>
       <Routes>
-        {user ? (
-          <Route element={<Layout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="*" element={<Dashboard />} />
-          </Route>
-        ) : (
-          <>
-            <Route path="/login" element={<Login />} />
-            <Route path="*" element={<Login />} />
-          </>
-        )}
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/*"
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="dashboard" element={<Dashboard />} />
+          {/* Otras rutas protegidas */}
+        </Route>
       </Routes>
     </Suspense>
   )
