@@ -6,6 +6,9 @@ import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
 import ProtectedRoute from './components/ProtectedRoute'
 import Loader from './components/ui/Loader'
+import UserList from './components/users/UserList'
+import UserForm from './components/users/UserForm'
+import UserProfile from './components/users/UserProfile'
 
 function App() {
   const { loading } = useAuth()
@@ -26,8 +29,16 @@ function App() {
             </ProtectedRoute>
           }
         >
+          <Route index element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
-          {/* Otras rutas protegidas */}
+          
+          {/* Rutas de gestión de usuarios */}
+          <Route path="users" element={<UserList />} />
+          <Route path="users/new" element={<UserForm />} />
+          <Route path="users/:documentNumber" element={<UserProfile />} />
+          <Route path="users/:documentNumber/edit" element={<UserForm />} />
+          
+          {/* Otras rutas protegidas pueden agregarse aquí */}
         </Route>
       </Routes>
     </Suspense>
