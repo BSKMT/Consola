@@ -1,4 +1,4 @@
-import { FaMotorcycle, FaUsers, FaCog } from 'react-icons/fa'
+import { FaMotorcycle, FaUsers, FaCog, FaUserPlus } from 'react-icons/fa'
 
 export default function Sidebar() {
   return (
@@ -16,6 +16,9 @@ export default function Sidebar() {
         <a href="/settings" className="flex items-center p-3 hover:bg-gray-700">
           <FaCog className="mr-2" /> Configuración
         </a>
+        <Link to="/users/create" className="flex items-center p-3 hover:bg-gray-700">
+          <FaUserPlus className="mr-2" /> Crear Usuario
+        </Link>
       </nav>
     </div>
   )
