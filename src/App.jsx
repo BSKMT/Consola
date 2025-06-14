@@ -15,6 +15,7 @@ export default function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="users/create" element={<CreateUser />} />
+            <Route path="users/edit/:documentNumber" element={<EditUser />} />
           </Route>
         </Route>
       </Routes>
