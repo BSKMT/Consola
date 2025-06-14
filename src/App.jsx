@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import ProtectedRoute from './components/ProtectedRoute'
 import CreateUser from './pages/users/CreateUser'
+import EditUser from './pages/users/EditUser'
 
 
 export default function App() {
