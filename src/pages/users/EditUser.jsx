@@ -92,22 +92,34 @@ export default function EditUser() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        console.log('Fetching user data for:', documentNumber)
         const response = await api.get(`/users/${documentNumber}`)
-        const user = response.data.user
+        console.log('API Response:', response)
         
-        // Formatear fecha de nacimiento para el input date
+        if (!response.data.data.user) {
+          throw new Error('User data not found in response')
+        }
+        
+        const user = response.data.data.user
+        console.log('User Data:', user)
+        
         const birthDate = user.birthDate ? new Date(user.birthDate).toISOString().split('T')[0] : ''
         
         setUserData({
           ...user,
           birthDate,
-          // Asegurar que los campos booleanos estén correctamente inicializados
           dataConsent: user.dataConsent || false,
           liabilityWaiver: user.liabilityWaiver || false,
-          termsAcceptance: user.termsAcceptance || false
+          termsAcceptance: user.termsAcceptance || false,
+          password: '' // No mostrar la contraseña actual
         })
       } catch (err) {
-        setError('Error al cargar los datos del usuario')
+        console.error('Error fetching user data:', {
+          message: err.message,
+          response: err.response,
+          stack: err.stack
+        })
+        setError(err.response?.data?.message || 'Error al cargar los datos del usuario')
       } finally {
         setIsLoading(false)
       }
