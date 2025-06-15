@@ -18,7 +18,7 @@ export default function App() {
             <Route index element={<Home />} />
             <Route path="users/create" element={<CreateUser />} />
             <Route path="users/edit/:documentNumber" element={<EditUser />} />
-            <Route path="users/List" element={<UserList />} />
+            <Route path="users" element={<UserList />} />
           </Route>
         </Route>
       </Routes>
