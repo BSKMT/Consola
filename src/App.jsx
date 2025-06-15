@@ -5,6 +5,7 @@ import Login from './pages/Login'
 import ProtectedRoute from './components/ProtectedRoute'
 import CreateUser from './pages/users/CreateUser'
 import EditUser from './pages/users/EditUser'
+import UserList from './pages/users/UserList'
 
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
             <Route index element={<Home />} />
             <Route path="users/create" element={<CreateUser />} />
             <Route path="users/edit/:documentNumber" element={<EditUser />} />
+            <Route path="users/List" element={<UserList />} />
           </Route>
         </Route>
       </Routes>
