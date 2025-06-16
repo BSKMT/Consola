@@ -17,7 +17,7 @@ export default function EditUser() {
     documentType: 'CC',
     documentNumber: '',
     avatar: '/default-avatar.jpg',
-    
+
     // Información personal
     firstName: '',
     lastName: '',
@@ -26,7 +26,7 @@ export default function EditUser() {
     birthPlace: '',
     binaryGender: 'Prefiero no decir',
     genderIdentity: '',
-    
+
     // Información de contacto
     address: '',
     neighborhood: '',
@@ -36,11 +36,11 @@ export default function EditUser() {
     phone: '',
     whatsapp: '',
     email: '',
-    
+
     // Información profesional
     occupation: '',
     discipline: '',
-    
+
     // Información médica
     bloodType: '',
     rhFactor: '',
@@ -49,7 +49,7 @@ export default function EditUser() {
     medicalTreatments: '',
     requiredMedications: '',
     healthInsurance: '',
-    
+
     // Contacto de emergencia
     emergencyContactName: '',
     emergencyContactRelationship: '',
@@ -57,19 +57,19 @@ export default function EditUser() {
     emergencyContactNeighborhood: '',
     emergencyContactCity: 'Colombia',
     emergencyContactPhone: '',
-    
+
     // Información de moto
     motorcyclePlate: '',
     motorcycleBrand: '',
     motorcycleModel: '',
     motorcycleYear: '',
     motorcycleDisplacement: '',
-    
+
     // Consents
     dataConsent: false,
     liabilityWaiver: false,
     termsAcceptance: false,
-    
+
     // Sistema de puntos
     points: 0,
     ridePoints: 0,
@@ -77,12 +77,12 @@ export default function EditUser() {
     trainingPoints: 0,
     partnerConsumptionPoints: 0,
     otherPoints: 0,
-    
+
     // Seguridad y autenticación
     password: '',
     temporaryPassword: false,
     role: 'Membresia Friend',
-    
+
     // Membresía
     membershipExpiry: '',
     membershipBenefits: []
@@ -95,16 +95,17 @@ export default function EditUser() {
         console.log('Fetching user data for:', documentNumber)
         const response = await api.get(`/users/${documentNumber}`)
         console.log('API Response:', response)
-        
-        if (!response.data.data.user) {
+
+        // Cambio aquí: ahora response ya es response.data.data del interceptor
+        if (!response.user) {
           throw new Error('User data not found in response')
         }
-        
-        const user = response.data.data.user
+
+        const user = response.user
         console.log('User Data:', user)
-        
+
         const birthDate = user.birthDate ? new Date(user.birthDate).toISOString().split('T')[0] : ''
-        
+
         setUserData({
           ...user,
           birthDate,
@@ -147,7 +148,7 @@ export default function EditUser() {
         'documentType', 'documentNumber', 'firstName', 'lastName',
         'birthDate', 'city', 'phone', 'email'
       ]
-      
+
       const missingFields = requiredFields.filter(field => !userData[field])
       if (missingFields.length > 0) {
         throw new Error(`Faltan campos obligatorios: ${missingFields.join(', ')}`)
@@ -155,7 +156,7 @@ export default function EditUser() {
 
       // Enviar datos al backend (PATCH /users/:documentNumber)
       const response = await api.patch(`/users/${documentNumber}`, userData)
-      
+
       // Redirigir a la lista de usuarios o mostrar mensaje de éxito
       navigate('/users', { state: { success: 'Usuario actualizado exitosamente' } })
     } catch (err) {
@@ -220,7 +221,7 @@ export default function EditUser() {
                 ))}
               </select>
             </div>
-            
+
             <div>
               <label className="block text-gray-700 mb-1">Número de Documento *</label>
               <input
@@ -234,7 +235,7 @@ export default function EditUser() {
                 maxLength="20"
               />
             </div>
-            
+
             <div>
               <label className="block text-gray-700 mb-1">Avatar URL</label>
               <input
@@ -268,7 +269,7 @@ export default function EditUser() {
                 maxLength="50"
               />
             </div>
-            
+
             <div>
               <label className="block text-gray-700 mb-1">Apellidos *</label>
               <input
@@ -281,7 +282,7 @@ export default function EditUser() {
                 maxLength="50"
               />
             </div>
-            
+
             <div>
               <label className="block text-gray-700 mb-1">Fecha de Nacimiento *</label>
               <input
@@ -293,7 +294,7 @@ export default function EditUser() {
                 required
               />
             </div>
-            
+
             <div>
               <label className="block text-gray-700 mb-1">Género</label>
               <select
@@ -307,7 +308,7 @@ export default function EditUser() {
                 ))}
               </select>
             </div>
-            
+
             <div>
               <label className="block text-gray-700 mb-1">Identidad de Género</label>
               <input
@@ -319,7 +320,7 @@ export default function EditUser() {
                 maxLength="50"
               />
             </div>
-            
+
             <div>
               <label className="block text-gray-700 mb-1">Lugar de Nacimiento</label>
               <input
@@ -349,7 +350,7 @@ export default function EditUser() {
                 maxLength="100"
               />
             </div>
-            
+
             <div>
               <label className="block text-gray-700 mb-1">Barrio</label>
               <input
@@ -361,7 +362,7 @@ export default function EditUser() {
                 maxLength="50"
               />
             </div>
-            
+
             <div>
               <label className="block text-gray-700 mb-1">Ciudad *</label>
               <input
@@ -374,7 +375,7 @@ export default function EditUser() {
                 maxLength="50"
               />
             </div>
-            
+
             <div>
               <label className="block text-gray-700 mb-1">País</label>
               <input
@@ -386,7 +387,7 @@ export default function EditUser() {
                 maxLength="50"
               />
             </div>
-            
+
             <div>
               <label className="block text-gray-700 mb-1">Teléfono *</label>
               <input
@@ -400,7 +401,7 @@ export default function EditUser() {
                 title="10-15 dígitos numéricos"
               />
             </div>
-            
+
             <div>
               <label className="block text-gray-700 mb-1">WhatsApp</label>
               <input
@@ -413,7 +414,7 @@ export default function EditUser() {
                 title="10-15 dígitos numéricos"
               />
             </div>
-            
+
             <div className="md:col-span-2">
               <label className="block text-gray-700 mb-1">Email *</label>
               <input
@@ -445,7 +446,7 @@ export default function EditUser() {
                 maxLength="10"
               />
             </div>
-            
+
             <div>
               <label className="block text-gray-700 mb-1">Marca</label>
               <input
@@ -457,7 +458,7 @@ export default function EditUser() {
                 maxLength="50"
               />
             </div>
-            
+
             <div>
               <label className="block text-gray-700 mb-1">Modelo</label>
               <input
@@ -469,7 +470,7 @@ export default function EditUser() {
                 maxLength="50"
               />
             </div>
-            
+
             <div>
               <label className="block text-gray-700 mb-1">Año</label>
               <input
@@ -503,7 +504,7 @@ export default function EditUser() {
                 ))}
               </select>
             </div>
-            
+
             <div>
               <label className="block text-gray-700 mb-1">Factor RH</label>
               <select
@@ -517,7 +518,7 @@ export default function EditUser() {
                 ))}
               </select>
             </div>
-            
+
             <div className="md:col-span-2">
               <label className="block text-gray-700 mb-1">Alergias</label>
               <input
@@ -529,7 +530,7 @@ export default function EditUser() {
                 maxLength="500"
               />
             </div>
-            
+
             <div className="md:col-span-2">
               <label className="block text-gray-700 mb-1">Condiciones Físicas</label>
               <textarea
@@ -541,7 +542,7 @@ export default function EditUser() {
                 maxLength="500"
               />
             </div>
-            
+
             <div className="md:col-span-2">
               <label className="block text-gray-700 mb-1">Tratamientos Médicos</label>
               <textarea
@@ -573,7 +574,7 @@ export default function EditUser() {
                 maxLength="100"
               />
             </div>
-            
+
             <div>
               <label className="block text-gray-700 mb-1">Parentesco</label>
               <input
@@ -585,7 +586,7 @@ export default function EditUser() {
                 maxLength="50"
               />
             </div>
-            
+
             <div>
               <label className="block text-gray-700 mb-1">Teléfono</label>
               <input
@@ -621,7 +622,7 @@ export default function EditUser() {
                 ))}
               </select>
             </div>
-            
+
             <div>
               <label className="block text-gray-700 mb-1">Contraseña (dejar vacío para no cambiar)</label>
               <input
@@ -634,7 +635,7 @@ export default function EditUser() {
               />
               <p className="text-sm text-gray-500 mt-1">Mínimo 8 caracteres</p>
             </div>
-            
+
             <div className="flex items-center">
               <input
                 type="checkbox"
@@ -673,7 +674,7 @@ export default function EditUser() {
                 <p className="text-gray-500">Autorizo el tratamiento de mis datos personales conforme a la política de privacidad.</p>
               </div>
             </div>
-            
+
             <div className="flex items-start">
               <div className="flex items-center h-5">
                 <input
@@ -692,7 +693,7 @@ export default function EditUser() {
                 <p className="text-gray-500">Exonero a BSK Motorcycle Team de cualquier responsabilidad por accidentes durante eventos.</p>
               </div>
             </div>
-            
+
             <div className="flex items-start">
               <div className="flex items-center h-5">
                 <input
