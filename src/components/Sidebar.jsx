@@ -38,12 +38,6 @@ export default function Sidebar() {
             >
               <FaUserPlus className="mr-2 text-sm" /> Crear Usuario
             </Link>
-            <Link 
-              to="/users/edit" 
-              className="flex items-center p-2 hover:bg-gray-600 rounded"
-            >
-              <FaUserEdit className="mr-2 text-sm" /> Editar Usuario
-            </Link>
           </div>
         </div>
 
