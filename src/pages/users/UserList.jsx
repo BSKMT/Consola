@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import api from '../../utils/api'
 import { FaEdit, FaTrash, FaUserPlus } from 'react-icons/fa'
+import Swal from 'sweetalert2' // Para alertas bonitas
 
 export default function UserList() {
   const [users, setUsers] = useState([])
@@ -10,23 +11,59 @@ export default function UserList() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await api.get('/users')
-        console.log('API Response:', response) // Para depuración
-        
-        // Ahora response ya viene con la estructura correcta gracias al interceptor
-        setUsers(response.users || [])
-      } catch (err) {
-        console.error('Error fetching user data:', err)
-        setError(err.message || 'Error al cargar los usuarios')
-      } finally {
-        setLoading(false)
-      }
-    }
+    fetchUsers()
+  }, [navigate])
 
-  fetchUsers()
-}, [navigate])
+  const fetchUsers = async () => {
+    try {
+      const response = await api.get('/users')
+      console.log('API Response:', response)
+      setUsers(response.users || [])
+    } catch (err) {
+      console.error('Error fetching user data:', err)
+      setError(err.message || 'Error al cargar los usuarios')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDeleteUser = async (documentNumber) => {
+    try {
+      // Confirmación antes de eliminar
+      const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: "¡No podrás revertir esto! El usuario será desactivado.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, desactivar',
+        cancelButtonText: 'Cancelar'
+      })
+
+      if (result.isConfirmed) {
+        // Llamada a la API para desactivar
+        await api.delete(`/users/${documentNumber}`)
+        
+        // Actualizar lista de usuarios
+        await fetchUsers()
+        
+        // Mostrar confirmación
+        Swal.fire(
+          '¡Desactivado!',
+          'El usuario ha sido desactivado.',
+          'success'
+        )
+      }
+    } catch (err) {
+      console.error('Error al desactivar usuario:', err)
+      Swal.fire(
+        'Error',
+        err.message || 'Ocurrió un error al desactivar el usuario',
+        'error'
+      )
+    }
+  }
 
   if (loading) {
     return (
@@ -62,6 +99,7 @@ export default function UserList() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rol</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
             </tr>
           </thead>
@@ -73,6 +111,11 @@ export default function UserList() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.firstName} {user.lastName}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.email}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.role}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                      {user.active ? 'Activo' : 'Inactivo'}
+                    </span>
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <Link
                       to={`/users/edit/${user.documentNumber}`}
@@ -80,15 +123,20 @@ export default function UserList() {
                     >
                       <FaEdit className="inline mr-1" /> Editar
                     </Link>
-                    <button className="text-red-600 hover:text-red-900">
-                      <FaTrash className="inline mr-1" /> Eliminar
+                    <button 
+                      onClick={() => handleDeleteUser(user.documentNumber)}
+                      className="text-red-600 hover:text-red-900"
+                      disabled={!user.active}
+                    >
+                      <FaTrash className="inline mr-1" /> 
+                      {user.active ? 'Desactivar' : 'Desactivado'}
                     </button>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500">
+                <td colSpan="6" className="px-6 py-4 text-center text-sm text-gray-500">
                   No se encontraron usuarios
                 </td>
               </tr>
