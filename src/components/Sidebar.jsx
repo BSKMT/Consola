@@ -1,3 +1,4 @@
+// src/components/Sidebar.jsx
 import { Link } from 'react-router-dom'
 import { 
   FaMotorcycle, 
@@ -6,8 +7,9 @@ import {
   FaUserPlus,
   FaUserEdit,
   FaList,
+  FaCalendarAlt,
   FaCalendarPlus,
-  FaCalendarAlt
+  FaCalendarCheck
 } from 'react-icons/fa'
 
 export default function Sidebar() {
@@ -22,7 +24,7 @@ export default function Sidebar() {
           <FaMotorcycle className="mr-2" /> Motos
         </Link>
         
-        {/* Sección de Usuarios */}
+        {/* Sección de Usuarios con submenú */}
         <div className="group">
           <div className="flex items-center p-3 hover:bg-gray-700 cursor-pointer">
             <FaUsers className="mr-2" /> Gestión de Usuarios
@@ -43,17 +45,29 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* Sección de Eventos */}
+        {/* Sección de Eventos con submenú */}
         <div className="group">
           <div className="flex items-center p-3 hover:bg-gray-700 cursor-pointer">
             <FaCalendarAlt className="mr-2" /> Gestión de Eventos
           </div>
           <div className="ml-4 hidden group-hover:block">
             <Link 
+              to="/events" 
+              className="flex items-center p-2 hover:bg-gray-600 rounded"
+            >
+              <FaList className="mr-2 text-sm" /> Lista de Eventos
+            </Link>
+            <Link 
               to="/events/create" 
               className="flex items-center p-2 hover:bg-gray-600 rounded"
             >
               <FaCalendarPlus className="mr-2 text-sm" /> Crear Evento
+            </Link>
+            <Link 
+              to="/events/update" 
+              className="flex items-center p-2 hover:bg-gray-600 rounded"
+            >
+              <FaCalendarCheck className="mr-2 text-sm" /> Actualizar Evento
             </Link>
           </div>
         </div>
