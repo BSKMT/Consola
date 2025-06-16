@@ -26,6 +26,7 @@ export default function UserList() {
           navigate('/login')
         } else {
           setError(err.message || 'Error al cargar usuarios')
+          console.error('Error fetching users:', err)
         }
       } finally {
         setLoading(false)
