@@ -31,10 +31,16 @@ api.interceptors.request.use((config) => {
 // Interceptor para manejar respuestas
 api.interceptors.response.use(
   (response) => {
-    // Manejar respuesta exitosa
-    if (response.data && response.data.status === 'success') {
-      return response.data.data // Extraemos solo la parte de datos para respuestas con estructura {status, data}
+    // Caso especial para la respuesta de login
+    if (response.config.url === '/auth/login') {
+      return response.data // Devuelve la estructura completa {status, accessToken, data}
     }
+    
+    // Para todas las demás respuestas
+    if (response.data && response.data.status === 'success') {
+      return response.data.data // Devuelve response.data.data para mantener compatibilidad
+    }
+    
     return response.data?.data || response.data || response
   },
   (error) => {

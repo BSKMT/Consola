@@ -11,49 +11,52 @@ export default function Login() {
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError('')
-    setIsLoading(true)
+  e.preventDefault()
+  setError('')
+  setIsLoading(true)
 
-    try {
-      // Hacemos la petición sin el interceptor que añade el token
-      const response = await api.post('/auth/login', { email, password }, {
-        skipAuthRefresh: true // Opcional: puedes añadir esta propiedad personalizada
-      })
+  try {
+    // Hacemos la petición sin el interceptor que añade el token
+    const response = await api.post('/auth/login', { email, password }, {
+      skipAuthRefresh: true // Opcional: puedes añadir esta propiedad personalizada
+    })
 
-      // Verificamos que la respuesta tenga la estructura esperada
-      if (!response?.data?.accessToken) {
-        throw new Error('La respuesta del servidor no contiene el token')
-      }
+    console.log('Respuesta completa:', response) // Para depuración
 
-      // Guardamos el token en localStorage
-      localStorage.setItem('token', response.data.accessToken)
-
-      // Redirigimos al dashboard
-      navigate('/')
-    } catch (err) {
-      console.error('Error en login:', err)
-      
-      // Manejo mejorado de errores
-      let errorMessage = 'Error al iniciar sesión'
-      if (err.response) {
-        // Error del servidor (4xx, 5xx)
-        errorMessage = err.response.data?.message || 
-                      err.response.statusText || 
-                      `Error ${err.response.status}`
-      } else if (err.request) {
-        // La petición fue hecha pero no hubo respuesta
-        errorMessage = 'No se recibió respuesta del servidor'
-      } else {
-        // Error al configurar la petición
-        errorMessage = err.message || 'Error al configurar la petición'
-      }
-
-      setError(errorMessage)
-    } finally {
-      setIsLoading(false)
+    // Verificamos que la respuesta tenga la estructura esperada
+    if (!response?.accessToken) {
+      throw new Error('La respuesta del servidor no contiene el token')
     }
+
+    // Guardamos el token en localStorage
+    localStorage.setItem('token', response.accessToken)
+    console.log('Token guardado:', response.accessToken) // Para depuración
+
+    // Redirigimos al dashboard
+    navigate('/')
+  } catch (err) {
+    console.error('Error en login:', err)
+    
+    // Manejo mejorado de errores
+    let errorMessage = 'Error al iniciar sesión'
+    if (err.response) {
+      // Error del servidor (4xx, 5xx)
+      errorMessage = err.response.data?.message || 
+                    err.response.statusText || 
+                    `Error ${err.response.status}`
+    } else if (err.request) {
+      // La petición fue hecha pero no hubo respuesta
+      errorMessage = 'No se recibió respuesta del servidor'
+    } else {
+      // Error al configurar la petición
+      errorMessage = err.message || 'Error al configurar la petición'
+    }
+
+    setError(errorMessage)
+  } finally {
+    setIsLoading(false)
   }
+}
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
