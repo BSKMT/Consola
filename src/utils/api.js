@@ -7,6 +7,11 @@ const api = axios.create({
 
 // Interceptor para añadir el token JWT a los headers
 api.interceptors.request.use((config) => {
+  // Excluir la ruta de login de la verificación del token
+  if (config.url === '/auth/login') {
+    return config
+  }
+
   const token = localStorage.getItem('token')
   
   // Solo añadir el token si existe y es válido
@@ -14,9 +19,10 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`
   } else {
     // Si no hay token válido, redirigir al login
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
       window.location.href = '/login'
     }
+    return Promise.reject(new Error('No hay token de autenticación'))
   }
   
   return config
@@ -35,7 +41,7 @@ api.interceptors.response.use(
     // Manejo de errores
     if (error.response?.status === 401 || error.response?.status === 403) {
       localStorage.removeItem('token')
-      if (typeof window !== 'undefined') {
+      if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
         window.location.href = '/login'
       }
     }
