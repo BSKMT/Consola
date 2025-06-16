@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import api from '../../utils/api'
 import { FaEdit, FaTrash, FaUserPlus } from 'react-icons/fa'
 
@@ -7,23 +7,33 @@ export default function UserList() {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
+        // Verificar si hay token antes de hacer la petición
+        const token = localStorage.getItem('token')
+        if (!token || token === 'undefined' || token === 'null') {
+          navigate('/login')
+          return
+        }
+
         const response = await api.get('/users')
-        // Ajustar para la estructura de tu API
-        setUsers(response.data.data.users || [])
+        setUsers(response.users || [])
       } catch (err) {
-        setError(err.response?.data?.message || 'Error al cargar los usuarios')
-        console.error('Error fetching users:', err)
+        if (err.status === 401 || err.status === 403) {
+          navigate('/login')
+        } else {
+          setError(err.message || 'Error al cargar usuarios')
+        }
       } finally {
         setLoading(false)
       }
     }
 
     fetchUsers()
-  }, [])
+  }, [navigate])
 
   if (loading) {
     return (
