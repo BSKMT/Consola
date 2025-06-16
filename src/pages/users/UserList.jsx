@@ -20,7 +20,7 @@ export default function UserList() {
         }
 
         const response = await api.get('/users')
-        setUsers(response.users || [])
+        setUsers(response.user || [])
       } catch (err) {
         if (err.status === 401 || err.status === 403) {
           navigate('/login')
