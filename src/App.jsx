@@ -6,7 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import CreateUser from './pages/users/CreateUser'
 import EditUser from './pages/users/EditUser'
 import UserList from './pages/users/UserList'
-
+import CreateEvent from './pages/events/CreateEvent'
 
 export default function App() {
   return (
@@ -19,6 +19,7 @@ export default function App() {
             <Route path="users/create" element={<CreateUser />} />
             <Route path="users/edit/:documentNumber" element={<EditUser />} />
             <Route path="users" element={<UserList />} />
+            <Route path="events/create" element={<CreateEvent />} />
           </Route>
         </Route>
       </Routes>

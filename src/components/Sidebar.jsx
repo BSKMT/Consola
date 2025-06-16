@@ -5,7 +5,9 @@ import {
   FaCog, 
   FaUserPlus,
   FaUserEdit,
-  FaList 
+  FaList,
+  FaCalendarPlus,
+  FaCalendarAlt
 } from 'react-icons/fa'
 
 export default function Sidebar() {
@@ -20,7 +22,7 @@ export default function Sidebar() {
           <FaMotorcycle className="mr-2" /> Motos
         </Link>
         
-        {/* Sección de Usuarios con submenú */}
+        {/* Sección de Usuarios */}
         <div className="group">
           <div className="flex items-center p-3 hover:bg-gray-700 cursor-pointer">
             <FaUsers className="mr-2" /> Gestión de Usuarios
@@ -37,6 +39,21 @@ export default function Sidebar() {
               className="flex items-center p-2 hover:bg-gray-600 rounded"
             >
               <FaUserPlus className="mr-2 text-sm" /> Crear Usuario
+            </Link>
+          </div>
+        </div>
+
+        {/* Sección de Eventos */}
+        <div className="group">
+          <div className="flex items-center p-3 hover:bg-gray-700 cursor-pointer">
+            <FaCalendarAlt className="mr-2" /> Gestión de Eventos
+          </div>
+          <div className="ml-4 hidden group-hover:block">
+            <Link 
+              to="/events/create" 
+              className="flex items-center p-2 hover:bg-gray-600 rounded"
+            >
+              <FaCalendarPlus className="mr-2 text-sm" /> Crear Evento
             </Link>
           </div>
         </div>
