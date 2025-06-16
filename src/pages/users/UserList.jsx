@@ -12,29 +12,21 @@ export default function UserList() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        // Verificar si hay token antes de hacer la petición
-        const token = localStorage.getItem('token')
-        if (!token || token === 'undefined' || token === 'null') {
-          navigate('/login')
-          return
-        }
-
         const response = await api.get('/users')
-        setUsers(response.user || [])
+        console.log('API Response:', response) // Para depuración
+        
+        // Ahora response ya viene con la estructura correcta gracias al interceptor
+        setUsers(response.users || [])
       } catch (err) {
-        if (err.status === 401 || err.status === 403) {
-          navigate('/login')
-        } else {
-          setError(err.message || 'Error al cargar usuarios')
-          console.error('Error fetching users:', err)
-        }
+        console.error('Error fetching user data:', err)
+        setError(err.message || 'Error al cargar los usuarios')
       } finally {
         setLoading(false)
       }
     }
 
-    fetchUsers()
-  }, [navigate])
+  fetchUsers()
+}, [navigate])
 
   if (loading) {
     return (
