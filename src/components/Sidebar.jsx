@@ -9,7 +9,7 @@ import {
   FaList,
   FaCalendarAlt,
   FaCalendarPlus,
-  FaCalendarCheck
+  FaCalendarEdit
 } from 'react-icons/fa'
 
 export default function Sidebar() {
@@ -64,10 +64,10 @@ export default function Sidebar() {
               <FaCalendarPlus className="mr-2 text-sm" /> Crear Evento
             </Link>
             <Link 
-              to="/events/update" 
+              to="/events/edit" 
               className="flex items-center p-2 hover:bg-gray-600 rounded"
             >
-              <FaCalendarCheck className="mr-2 text-sm" /> Actualizar Evento
+              <FaCalendarEdit className="mr-2 text-sm" /> Editar Evento
             </Link>
           </div>
         </div>

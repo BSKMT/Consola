@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../../utils/api'
+import { toast } from 'react-toastify'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 
@@ -13,12 +14,11 @@ export default function EventList() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await api.get('/events')
-        // Ordenar por fecha del evento (no de creación)
-        const sortedEvents = response.sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
-        setEvents(sortedEvents)
+        const response = await api.get('/events?sort=-startDate')
+        setEvents(response.events || [])
       } catch (err) {
         setError(err.message)
+        toast.error('Error al cargar los eventos')
       } finally {
         setLoading(false)
       }
@@ -27,43 +27,49 @@ export default function EventList() {
     fetchEvents()
   }, [])
 
-  if (loading) return <div className="p-4">Cargando eventos...</div>
-  if (error) return <div className="p-4 text-red-500">Error: {error}</div>
+  if (loading) return <div className="p-6">Cargando eventos...</div>
+  if (error) return <div className="p-6 text-red-500">Error: {error}</div>
 
   return (
-    <div className="p-4">
+    <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Lista de Eventos</h1>
         <Link 
           to="/events/create" 
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
           Crear Nuevo Evento
         </Link>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white rounded-lg overflow-hidden">
-          <thead className="bg-gray-800 text-white">
+      <div className="bg-white shadow rounded-lg overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
             <tr>
-              <th className="py-3 px-4 text-left">Nombre</th>
-              <th className="py-3 px-4 text-left">Tipo</th>
-              <th className="py-3 px-4 text-left">Fecha</th>
-              <th className="py-3 px-4 text-left">Estado</th>
-              <th className="py-3 px-4 text-left">Participantes</th>
-              <th className="py-3 px-4 text-left">Acciones</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Participantes</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
             </tr>
           </thead>
-          <tbody className="text-gray-700">
+          <tbody className="bg-white divide-y divide-gray-200">
             {events.map((event) => (
-              <tr key={event._id} className="border-b border-gray-200 hover:bg-gray-50">
-                <td className="py-3 px-4">{event.name}</td>
-                <td className="py-3 px-4 capitalize">{event.eventType}</td>
-                <td className="py-3 px-4">
-                  {format(new Date(event.startDate), 'PPP', { locale: es })}
+              <tr key={event._id}>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="font-medium text-gray-900">{event.name}</div>
                 </td>
-                <td className="py-3 px-4">
-                  <span className={`px-2 py-1 rounded-full text-xs ${
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                    {event.eventType}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {format(new Date(event.startDate), 'PPP', { locale: es })} - {format(new Date(event.endDate), 'PPP', { locale: es })}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                     event.eventStatus === 'confirmed' ? 'bg-green-100 text-green-800' :
                     event.eventStatus === 'postponed' ? 'bg-yellow-100 text-yellow-800' :
                     event.eventStatus === 'canceled' ? 'bg-red-100 text-red-800' :
@@ -74,13 +80,13 @@ export default function EventList() {
                      event.eventStatus === 'canceled' ? 'Cancelado' : 'Completado'}
                   </span>
                 </td>
-                <td className="py-3 px-4">
+                <td className="px-6 py-4 whitespace-nowrap">
                   {event.registeredParticipants} / {event.maxParticipants}
                 </td>
-                <td className="py-3 px-4">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <Link
-                    to={`/events/update/${event._id}`}
-                    className="text-blue-600 hover:text-blue-800 mr-3"
+                    to={`/events/edit/${event._id}`}
+                    className="text-blue-600 hover:text-blue-900 mr-4"
                   >
                     Editar
                   </Link>
