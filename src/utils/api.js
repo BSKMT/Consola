@@ -14,15 +14,43 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Interceptor para manejar errores globales
+// Interceptor para manejar respuestas exitosas
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Normalizamos la estructura de respuesta exitosa
+    if (response.data && response.data.status === 'success') {
+      // Para respuestas con estructura {status, data}
+      return {
+        ...response,
+        data: response.data.data // Extraemos solo la parte de datos
+      }
+    }
+    // Para otras respuestas que no siguen el formato estándar
+    return response
+  },
+  // Interceptor para manejar errores
   (error) => {
+    // Manejo de errores de autenticación
     if (error.response?.status === 401) {
       localStorage.removeItem('token')
-      window.location.href = '/login' // Redirige si el token es inválido
+      window.location.href = '/login'
     }
-    return Promise.reject(error)
+
+    // Normalización de errores
+    const normalizedError = {
+      message: error.response?.data?.message || 
+              error.message || 
+              'Error de conexión con el servidor',
+      status: error.response?.status,
+      data: error.response?.data
+    }
+
+    // Opcional: Mostrar notificación de error global
+    if (typeof window !== 'undefined' && normalizedError.message) {
+      console.error('API Error:', normalizedError.message)
+    }
+
+    return Promise.reject(normalizedError)
   }
 )
 

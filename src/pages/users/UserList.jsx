@@ -12,9 +12,11 @@ export default function UserList() {
     const fetchUsers = async () => {
       try {
         const response = await api.get('/users')
-        setUsers(response.data.users)
+        // Ajustar para la estructura de tu API
+        setUsers(response.data.data.users || [])
       } catch (err) {
-        setError('Error al cargar los usuarios')
+        setError(err.response?.data?.message || 'Error al cargar los usuarios')
+        console.error('Error fetching users:', err)
       } finally {
         setLoading(false)
       }
@@ -61,25 +63,33 @@ export default function UserList() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {users.map(user => (
-              <tr key={user.documentNumber}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.documentNumber}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.firstName} {user.lastName}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.email}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.role}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <Link
-                    to={`/users/edit/${user.documentNumber}`}
-                    className="text-blue-600 hover:text-blue-900 mr-4"
-                  >
-                    <FaEdit className="inline mr-1" /> Editar
-                  </Link>
-                  <button className="text-red-600 hover:text-red-900">
-                    <FaTrash className="inline mr-1" /> Eliminar
-                  </button>
+            {users.length > 0 ? (
+              users.map(user => (
+                <tr key={user.documentNumber}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.documentNumber}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.firstName} {user.lastName}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.email}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.role}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <Link
+                      to={`/users/edit/${user.documentNumber}`}
+                      className="text-blue-600 hover:text-blue-900 mr-4"
+                    >
+                      <FaEdit className="inline mr-1" /> Editar
+                    </Link>
+                    <button className="text-red-600 hover:text-red-900">
+                      <FaTrash className="inline mr-1" /> Eliminar
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500">
+                  No se encontraron usuarios
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
