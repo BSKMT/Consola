@@ -8,7 +8,7 @@ import {
   FaList,
   FaCalendarAlt,
   FaCalendarPlus,
-  FaCalendarEdit
+  FaCalendarDay
 } from 'react-icons/fa'
 
 export default function Sidebar() {
@@ -66,7 +66,7 @@ export default function Sidebar() {
               to="/events/edit" 
               className="flex items-center p-2 hover:bg-gray-600 rounded"
             >
-              <FaCalendarEdit className="mr-2 text-sm" /> Editar Evento
+              <FaCalendarDay className="mr-2 text-sm" /> Editar Evento
             </Link>
           </div>
         </div>
