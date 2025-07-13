@@ -19,6 +19,12 @@ export default function CreateEvent() {
     meetupTime: '08:00',
     departureTime: '09:00',
     durationDays: 1,
+    generalRegistrationDates: {
+      preSaleStart: '',
+      preSaleEnd: '',
+      generalSaleStart: '',
+      generalSaleEnd: ''
+    },
     
     // Ubicaciones
     departureLocation: {
@@ -45,8 +51,8 @@ export default function CreateEvent() {
         friend: 0,
         rider: 25,
         pro: 50,
-        volunteer: 75,
-        leader: 100
+        volunteer: 50,
+        leader: 50
       },
       companion: {
         friend: 0,
@@ -73,6 +79,7 @@ export default function CreateEvent() {
     eventPurpose: 'Community',
     
     // Organización
+    organizer: null,
     maxParticipants: 20,
     pointsAwarded: {
       rider: 0,
@@ -80,8 +87,20 @@ export default function CreateEvent() {
     },
     
     // Estados
-    registrationStatus: 'upcoming',
-    eventStatus: 'confirmed'
+    preSaleStatus: 'upcoming',
+    generalSaleStatus: 'upcoming',
+    eventStatus: 'confirmed',
+    
+    // Registros
+    registeredParticipants: 0,
+    registrations: [],
+    
+    // Notificaciones
+    notificationsSent: [],
+    
+    // Metadata
+    createdBy: null,
+    updatedBy: null
   })
 
   const handleChange = (e) => {
@@ -89,17 +108,42 @@ export default function CreateEvent() {
     
     // Manejar campos anidados
     if (name.includes('.')) {
-      const [parent, child, subChild] = name.split('.')
+      const [parent, child, subChild, subSubChild] = name.split('.')
       
-      setEventData(prev => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent],
-          [child]: subChild 
-            ? { ...prev[parent][child], [subChild]: value }
-            : value
-        }
-      }))
+      if (subSubChild) {
+        setEventData(prev => ({
+          ...prev,
+          [parent]: {
+            ...prev[parent],
+            [child]: {
+              ...prev[parent][child],
+              [subChild]: {
+                ...prev[parent][child][subChild],
+                [subSubChild]: value
+              }
+            }
+          }
+        }))
+      } else if (subChild) {
+        setEventData(prev => ({
+          ...prev,
+          [parent]: {
+            ...prev[parent],
+            [child]: {
+              ...prev[parent][child],
+              [subChild]: value
+            }
+          }
+        }))
+      } else {
+        setEventData(prev => ({
+          ...prev,
+          [parent]: {
+            ...prev[parent],
+            [child]: value
+          }
+        }))
+      }
     } else {
       setEventData(prev => ({
         ...prev,
@@ -341,6 +385,66 @@ export default function CreateEvent() {
                 onChange={handleChange}
                 min="1"
                 max="30"
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Nuevos campos de fechas de registro */}
+          <h3 className="text-lg font-semibold mt-6 mb-4">Fechas de Registro</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Inicio Pre-Venta *
+              </label>
+              <input
+                type="date"
+                name="generalRegistrationDates.preSaleStart"
+                value={eventData.generalRegistrationDates.preSaleStart}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Fin Pre-Venta *
+              </label>
+              <input
+                type="date"
+                name="generalRegistrationDates.preSaleEnd"
+                value={eventData.generalRegistrationDates.preSaleEnd}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Inicio Venta General *
+              </label>
+              <input
+                type="date"
+                name="generalRegistrationDates.generalSaleStart"
+                value={eventData.generalRegistrationDates.generalSaleStart}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Fin Venta General *
+              </label>
+              <input
+                type="date"
+                name="generalRegistrationDates.generalSaleEnd"
+                value={eventData.generalRegistrationDates.generalSaleEnd}
+                onChange={handleChange}
                 className="w-full p-2 border rounded"
                 required
               />
@@ -1021,11 +1125,28 @@ export default function CreateEvent() {
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Estado de Registro
+                Estado Pre-Venta
               </label>
               <select
-                name="registrationStatus"
-                value={eventData.registrationStatus}
+                name="preSaleStatus"
+                value={eventData.preSaleStatus}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              >
+                <option value="available">Disponible</option>
+                <option value="upcoming">Próximamente</option>
+                <option value="closed">Cerrado</option>
+                <option value="sold-out">Agotado</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Estado Venta General
+              </label>
+              <select
+                name="generalSaleStatus"
+                value={eventData.generalSaleStatus}
                 onChange={handleChange}
                 className="w-full p-2 border rounded"
               >
