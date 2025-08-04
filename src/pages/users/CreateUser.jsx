@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../../utils/api'
-import { FaUserPlus, FaMotorcycle, FaIdCard, FaInfoCircle, FaShieldAlt, FaMedal } from 'react-icons/fa'
-import { MdMedicalServices, MdEmergency } from 'react-icons/md'
 
 export default function CreateUser() {
     const navigate = useNavigate()
@@ -265,23 +263,40 @@ export default function CreateUser() {
     const genders = ['Masculino', 'Femenino', 'Prefiero no decir']
 
     return (
-        <div className="max-w-6xl mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-6 flex items-center">
-                <FaUserPlus className="mr-2" /> Crear Nuevo Usuario
-            </h1>
+        <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                    Crear Nuevo Usuario
+                </h1>
+                <p className="text-gray-600">
+                    Complete la información del nuevo usuario del sistema
+                </p>
+            </div>
 
             {error && (
-                <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
-                    {error}
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+                    <div className="flex">
+                        <div className="flex-shrink-0">
+                            <span className="inline-block w-4 h-4 bg-red-500 rounded-full text-white text-xs leading-4 text-center font-bold">!</span>
+                        </div>
+                        <div className="ml-3">
+                            <pre className="whitespace-pre-wrap">{error}</pre>
+                        </div>
+                    </div>
                 </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Sección 1: Documento e identificación */}
-                <div className="bg-white p-6 rounded-lg shadow">
-                    <h2 className="text-xl font-semibold mb-4 flex items-center">
-                        <FaIdCard className="mr-2" /> Documento e Identificación
-                    </h2>
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div className="border-b border-gray-200 pb-4 mb-6">
+                        <h2 className="text-xl font-semibold text-gray-900">
+                            Documento e Identificación
+                        </h2>
+                        <p className="text-sm text-gray-600 mt-1">
+                            Información básica de identificación del usuario
+                        </p>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label className="block text-gray-700 mb-1">Tipo de Documento *</label>
@@ -328,10 +343,15 @@ export default function CreateUser() {
                 </div>
 
                 {/* Sección 2: Información Personal */}
-                <div className="bg-white p-6 rounded-lg shadow">
-                    <h2 className="text-xl font-semibold mb-4 flex items-center">
-                        <FaInfoCircle className="mr-2" /> Información Personal
-                    </h2>
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div className="border-b border-gray-200 pb-4 mb-6">
+                        <h2 className="text-xl font-semibold text-gray-900">
+                            Información Personal
+                        </h2>
+                        <p className="text-sm text-gray-600 mt-1">
+                            Datos personales y demográficos del usuario
+                        </p>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
                             <label className="block text-gray-700 mb-1">Nombres *</label>
@@ -412,8 +432,15 @@ export default function CreateUser() {
                 </div>
 
                 {/* Sección 3: Información de Contacto */}
-                <div className="bg-white p-6 rounded-lg shadow">
-                    <h2 className="text-xl font-semibold mb-4">Información de Contacto</h2>
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div className="border-b border-gray-200 pb-4 mb-6">
+                        <h2 className="text-xl font-semibold text-gray-900">
+                            Información de Contacto
+                        </h2>
+                        <p className="text-sm text-gray-600 mt-1">
+                            Datos de contacto y ubicación del usuario
+                        </p>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
                             <label className="block text-gray-700 mb-1">Dirección</label>
@@ -506,10 +533,15 @@ export default function CreateUser() {
                 </div>
 
                 {/* Sección 4: Información de Moto */}
-                <div className="bg-white p-6 rounded-lg shadow">
-                    <h2 className="text-xl font-semibold mb-4 flex items-center">
-                        <FaMotorcycle className="mr-2" /> Información de Moto
-                    </h2>
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div className="border-b border-gray-200 pb-4 mb-6">
+                        <h2 className="text-xl font-semibold text-gray-900">
+                            Información de Moto
+                        </h2>
+                        <p className="text-sm text-gray-600 mt-1">
+                            Detalles de la motocicleta del usuario
+                        </p>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
                             <label className="block text-gray-700 mb-1">Placa</label>
@@ -562,10 +594,15 @@ export default function CreateUser() {
                 </div>
 
                 {/* Sección 5: Información Médica */}
-                <div className="bg-white p-6 rounded-lg shadow">
-                    <h2 className="text-xl font-semibold mb-4 flex items-center">
-                        <MdMedicalServices className="mr-2" /> Información Médica
-                    </h2>
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div className="border-b border-gray-200 pb-4 mb-6">
+                        <h2 className="text-xl font-semibold text-gray-900">
+                            Información Médica
+                        </h2>
+                        <p className="text-sm text-gray-600 mt-1">
+                            Datos médicos y de salud del usuario
+                        </p>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
                             <label className="block text-gray-700 mb-1">Tipo de Sangre</label>
@@ -634,10 +671,15 @@ export default function CreateUser() {
                 </div>
 
                 {/* Sección 6: Contacto de Emergencia */}
-                <div className="bg-white p-6 rounded-lg shadow">
-                    <h2 className="text-xl font-semibold mb-4 flex items-center">
-                        <MdEmergency className="mr-2" /> Contacto de Emergencia
-                    </h2>
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div className="border-b border-gray-200 pb-4 mb-6">
+                        <h2 className="text-xl font-semibold text-gray-900">
+                            Contacto de Emergencia
+                        </h2>
+                        <p className="text-sm text-gray-600 mt-1">
+                            Persona de contacto en caso de emergencia
+                        </p>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
                             <label className="block text-gray-700 mb-1">Nombre</label>
@@ -679,10 +721,15 @@ export default function CreateUser() {
                 </div>
 
                 {/* Sección 7: Permisos y Seguridad */}
-                <div className="bg-white p-6 rounded-lg shadow">
-                    <h2 className="text-xl font-semibold mb-4 flex items-center">
-                        <FaShieldAlt className="mr-2" /> Permisos y Seguridad
-                    </h2>
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div className="border-b border-gray-200 pb-4 mb-6">
+                        <h2 className="text-xl font-semibold text-gray-900">
+                            Permisos y Seguridad
+                        </h2>
+                        <p className="text-sm text-gray-600 mt-1">
+                            Configuración de acceso y contraseña
+                        </p>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-gray-700 mb-1">Rol *</label>
@@ -730,8 +777,15 @@ export default function CreateUser() {
                 </div>
 
                 {/* Sección 8: Consentimientos */}
-                <div className="bg-white p-6 rounded-lg shadow">
-                    <h2 className="text-xl font-semibold mb-4">Consentimientos</h2>
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <div className="border-b border-gray-200 pb-4 mb-6">
+                        <h2 className="text-xl font-semibold text-gray-900">
+                            Consentimientos
+                        </h2>
+                        <p className="text-sm text-gray-600 mt-1">
+                            Aceptación de términos y condiciones
+                        </p>
+                    </div>
                     <div className="space-y-4">
                         <div className="flex items-start">
                             <div className="flex items-center h-5">
