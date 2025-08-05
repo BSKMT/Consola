@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'https://api.bskmt.com',
+  baseURL: 'https://api.bskmt.com/api/v1',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
@@ -26,22 +26,17 @@ api.interceptors.response.use(
     // Handle successful responses
     const responseData = response.data
     
-    // Case 1: Structure {status, data, accessToken} (login response)
-    if (responseData?.status === 'success' && responseData.accessToken) {
-      return responseData
+    // Your backend returns {status: 'success', data: {...}} structure
+    if (responseData?.status === 'success') {
+      // For login endpoint, return the full response to access user data
+      if (responseData.data?.user) {
+        return responseData.data
+      }
+      // For other endpoints, return the data part
+      return responseData.data || responseData
     }
     
-    // Case 2: Structure {status, data} (other endpoints)
-    if (responseData?.status === 'success' && responseData.data) {
-      return responseData.data
-    }
-    
-    // Case 3: Direct structure {data} (legacy)
-    if (responseData?.data) {
-      return responseData.data
-    }
-    
-    // Default case
+    // Default case - return the full response data
     return responseData || response
   },
   (error) => {
@@ -54,7 +49,7 @@ api.interceptors.response.use(
       }
     }
     
-    // Normalize error structure
+    // Normalize error structure based on your backend
     const normalizedError = {
       message: error.response?.data?.message || 
               error.message || 

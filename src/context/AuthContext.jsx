@@ -25,9 +25,9 @@ export const AuthProvider = ({ children }) => {
   const checkAuthStatus = async () => {
     try {
       setIsLoading(true)
-      // Try to get current user info from backend
-      const response = await api.get('/auth/me')
-      setCurrentUser(response)
+      // Try to get current user info from backend using the verifyToken endpoint
+      const response = await api.get('/auth/verifyToken')
+      setCurrentUser(response.user)
     } catch (error) {
       // If request fails, user is not authenticated
       setCurrentUser(null)
@@ -45,19 +45,27 @@ export const AuthProvider = ({ children }) => {
       
       return { success: true, data: response }
     } catch (error) {
+      let errorMessage = 'Error al iniciar sesión'
+      
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error.response?.data?.errors) {
+        errorMessage = error.response.data.errors.map(err => err.message).join(', ')
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
       return { 
         success: false, 
-        error: error.message || 'Error al iniciar sesión' 
+        error: errorMessage
       }
     }
   }
 
   const logoutUser = async () => {
     try {
-      // Call logout endpoint if available
-      await api.post('/auth/logout').catch(() => {
-        // Ignore errors on logout endpoint - might not exist
-      })
+      // Call logout endpoint
+      await api.post('/auth/logout')
     } catch (error) {
       console.error('Error during logout:', error)
     } finally {
