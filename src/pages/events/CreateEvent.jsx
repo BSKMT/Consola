@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import api from '../../utils/api'
+import http from '../../lib/http'
 import { toast } from 'react-toastify'
 
 export default function CreateEvent() {
@@ -194,7 +194,7 @@ export default function CreateEvent() {
     setIsSubmitting(true)
     
     try {
-      await api.post('/events', eventData)
+      await http.postJson('/events', eventData)
       toast.success('Evento creado exitosamente!')
       navigate('/')
     } catch (error) {

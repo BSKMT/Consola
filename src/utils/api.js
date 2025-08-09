@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.bskmt.com/api/v1'
+
 const api = axios.create({
-  baseURL: 'https://api.bskmt.com/api/v1',
+  baseURL,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json'

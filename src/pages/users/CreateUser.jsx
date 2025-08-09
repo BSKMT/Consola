@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import api from '../../utils/api'
+import http from '../../lib/http'
 
 export default function CreateUser() {
     const navigate = useNavigate()
@@ -213,13 +213,13 @@ export default function CreateUser() {
     console.log('Payload a enviar:', payload); // Para debugging
 
     // 5. Enviar al backend
-    const response = await api.post('/users', payload);
+    const response = await http.postJson('/users', payload);
     
     // 6. Redirigir con éxito
     navigate('/users', { 
       state: { 
         success: `Usuario ${payload.documentNumber} creado con éxito!`,
-        newUser: response.data.user
+    newUser: response?.data?.user || response?.user || response
       } 
     });
 
